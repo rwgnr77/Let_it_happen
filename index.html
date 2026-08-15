@@ -3,180 +3,32 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Random Generator</title>
+<title>Let it happen – proefversie</title>
 <style>
-  :root{
-    --bg:#170910;--bg2:#32111f;--panel:rgba(39,14,27,.78);--panel2:rgba(255,238,242,.055);
-    --text:#fff8fa;--muted:#d4aeb9;--line:rgba(255,225,233,.13);--accent:#ff6f91;--accent2:#ffb0be;
-    --good:#ffc1cf;--shadow:0 30px 90px rgba(0,0,0,.46);--radius:24px;
-  }
-  *{box-sizing:border-box}
-  html,body{min-height:100%}
-  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);
-    background:
-      radial-gradient(ellipse at 12% 18%,rgba(255,94,132,.22),transparent 30%),
-      radial-gradient(ellipse at 86% 12%,rgba(160,35,83,.28),transparent 34%),
-      radial-gradient(ellipse at 78% 78%,rgba(255,176,190,.10),transparent 26%),
-      linear-gradient(145deg,var(--bg),#0d060a 58%,#280d19);
-  }
-  body:before{content:"";position:fixed;inset:-12%;pointer-events:none;opacity:.7;background:radial-gradient(ellipse at 24% 55%,transparent 0 12%,rgba(255,125,153,.10) 12.5% 14%,transparent 14.5% 100%),radial-gradient(ellipse at 76% 44%,transparent 0 15%,rgba(255,214,222,.07) 15.5% 17%,transparent 17.5% 100%);transform:rotate(-8deg)}
-  body:after{content:"";position:fixed;width:420px;height:650px;right:-170px;bottom:-250px;border:1px solid rgba(255,172,190,.12);border-radius:52% 48% 55% 45%;transform:rotate(28deg);box-shadow:0 0 100px rgba(255,76,120,.08);pointer-events:none}
-  .wrap{width:min(1100px,calc(100% - 32px));margin:0 auto;padding:52px 0 64px;position:relative}
-  header{margin-bottom:26px}
-  .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2);font-weight:800;margin-bottom:10px}
-  h1{font-size:clamp(34px,6vw,62px);line-height:.98;letter-spacing:-.045em;margin:0;max-width:780px}
-  .sub{margin:18px 0 0;color:var(--muted);font-size:17px;line-height:1.55;max-width:720px}
-  .grid{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:22px;align-items:start}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-  .input-card{padding:24px;position:sticky;top:20px}
-  .card-title{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
-  .helper{font-size:13px;color:var(--muted);line-height:1.45;margin-bottom:18px}
-  .names{display:flex;flex-direction:column;gap:9px}
-  .name-row{display:grid;grid-template-columns:32px 1fr 34px;gap:8px;align-items:center}
-  .num{font-size:12px;color:#77819a;text-align:center;font-variant-numeric:tabular-nums}
-  input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.055);color:var(--text);border-radius:13px;padding:12px 13px;font:inherit;outline:none;transition:.18s ease}
-  input::placeholder{color:#68728b}
-  input:focus{border-color:rgba(255,111,145,.7);box-shadow:0 0 0 3px rgba(255,111,145,.11);background:rgba(255,255,255,.075)}
-  .remove{border:0;background:transparent;color:#78829a;font-size:18px;cursor:pointer;border-radius:10px;height:34px;transition:.15s ease}
-  .remove:hover{background:rgba(255,255,255,.07);color:#fff}
-  .input-actions{display:flex;gap:10px;margin-top:14px}
-  button{font:inherit}
-  .add{flex:1;border:1px dashed rgba(255,255,255,.18);background:transparent;color:var(--muted);border-radius:13px;padding:11px 12px;cursor:pointer;font-weight:700;transition:.18s ease}
-  .add:hover{color:#fff;border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.035)}
-  .generate{width:100%;margin-top:18px;border:0;border-radius:15px;padding:14px 18px;cursor:pointer;font-weight:900;font-size:16px;color:#0b1020;background:linear-gradient(135deg,#ffc2ce,#ff7998 56%,#d94975);box-shadow:0 12px 34px rgba(216,62,105,.24);transition:transform .15s ease,filter .15s ease}
-  .generate:hover{transform:translateY(-1px);filter:brightness(1.05)}
-  .generate:active{transform:translateY(1px)}
-  .generate:disabled{opacity:.42;cursor:not-allowed;transform:none;filter:none}
-  .result-card{padding:24px;min-height:500px;overflow:hidden;position:relative}
-  .result-card:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-120px;top:-120px;background:rgba(255,93,133,.10);filter:blur(10px);pointer-events:none}
-  .result-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
-  .status{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#7f8aa3;font-weight:800}
-  .status.ready{color:var(--good)}
-  .empty{height:395px;display:grid;place-items:center;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px;background:rgba(255,255,255,.02);padding:30px}
-  .empty strong{display:block;color:#fff;font-size:20px;margin-bottom:7px}
-  .outcome{display:none;animation:pop .38s cubic-bezier(.2,.8,.2,1)}
-  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
-  .person{padding:20px;border-radius:18px;background:linear-gradient(135deg,rgba(255,184,199,.10),rgba(180,45,87,.16));border:1px solid rgba(255,255,255,.12);margin-bottom:14px}
-  .label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:#8993aa;font-weight:800;margin-bottom:5px}
-  .person-name{font-size:34px;line-height:1.05;font-weight:900;letter-spacing:-.035em;overflow-wrap:anywhere}
-  .field{padding:16px 17px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);margin-top:10px}
-  .sequence{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:750;font-size:16px;line-height:1.45}
-  .pill{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.075)}
-  .arrow{color:#69748d;font-weight:400}
-  .single{font-size:18px;font-weight:800;letter-spacing:-.01em}
-  .ending{margin-top:12px;padding:18px 17px;border-radius:16px;border:1px solid rgba(167,139,250,.24);background:rgba(167,139,250,.09)}
-  .again{margin-top:16px;color:#78829a;font-size:12px;text-align:right}
-  @media(max-width:800px){.wrap{padding-top:32px}.grid{grid-template-columns:1fr}.input-card{position:static}.result-card{min-height:auto}.empty{height:270px}h1{font-size:42px}}
-</style>
-</head>
-<body>
-<main class="wrap">
-  <header>
-    <div class="eyebrow">Random generator</div>
-    <h1>Let it happen</h1>
-  </header>
-
-  <section class="grid">
-    <aside class="card input-card">
-      <h2 class="card-title">Namen</h2>
-      <div id="names" class="names"></div>
-      <div class="input-actions"><button id="addName" class="add" type="button">+ Naam toevoegen</button></div>
-      <button id="generate" class="generate" type="button" disabled>Genereer uitkomst</button>
-    </aside>
-
-    <section class="card result-card" aria-live="polite">
-      <div class="result-top">
-        <h2 class="card-title" style="margin:0">Vandaag</h2>
-        <div id="status" class="status">Nog niet gegenereerd</div>
-      </div>
-      <div id="empty" class="empty"><div><strong>Let it happen</strong></div></div>
-      <div id="outcome" class="outcome">
-        <div class="person"><div id="person" class="person-name"></div></div>
-
-        <div class="field">
-          <div id="allActions" class="sequence"></div>
-        </div>
-        <button id="generateBottom" class="generate" type="button">Genereer uitkomst</button>
-      </div>
-    </section>
-  </section>
-</main>
-
-<script>
-const rows = [
-  {nr:1,a1:'aftrekken',a2:'aftrekken',a3:'aftrekken',a4:null,a5:null,a6:null,a7:'aftrekken',ends:['handen','borsten','gezicht']},
-  {nr:2,a1:'pijpen',a2:'pijpen',a3:'pijpen',a4:null,a5:null,a6:null,a7:'pijpen',ends:['mond','gezicht','borsten']},
-  {nr:3,a1:null,a2:'beffen',a3:'beffen',a4:null,a5:null,a6:null,a7:'beffen',ends:['vulva','buik']},
-  {nr:4,a1:null,a2:null,a3:null,a4:'missionaris',a5:'missionaris',a6:'missionaris',a7:'missionaris',ends:['vagina','vulva','buik']},
-  {nr:5,a1:null,a2:null,a3:null,a4:'doggy',a5:'doggy',a6:'doggy',a7:'doggy',ends:['vagina','billen']},
-  {nr:6,a1:null,a2:null,a3:null,a4:'rijden',a5:'rijden',a6:'rijden',a7:'rijden',ends:['vagina']}
-];
-
-const namesEl = document.getElementById('names');
-const addBtn = document.getElementById('addName');
-const genBtn = document.getElementById('generate');
-let nextId = 1;
-
-function addName(value=''){
-  if(namesEl.children.length >= 10) return;
-  const row = document.createElement('div'); row.className='name-row'; row.dataset.id=nextId++;
-  row.innerHTML = `<div class="num"></div><input type="text" maxlength="60" autocomplete="off" placeholder="Naam"><button class="remove" type="button" aria-label="Verwijder naam">×</button>`;
-  const input=row.querySelector('input'); input.value=value;
-  input.addEventListener('input',updateState);
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); if(namesEl.children.length<10){addName(); namesEl.lastElementChild.querySelector('input').focus()} else genBtn.click();}});
-  row.querySelector('.remove').addEventListener('click',()=>{if(namesEl.children.length>1) row.remove(); else input.value=''; renumber(); updateState();});
-  namesEl.appendChild(row); renumber(); updateState();
+:root{
+  --bg:#170910;--panel:rgba(39,14,27,.82);--panel2:rgba(255,238,242,.055);
+  --text:#fff8fa;--muted:#d4aeb9;--line:rgba(255,225,233,.13);
+  --accent:#ff6f91;--accent2:#ffb0be;--good:#ffc1cf;
+  --shadow:0 30px 90px rgba(0,0,0,.46);--radius:24px;
 }
-function renumber(){[...namesEl.children].forEach((r,i)=>r.querySelector('.num').textContent=String(i+1).padStart(2,'0'));addBtn.disabled=namesEl.children.length>=10;addBtn.style.opacity=addBtn.disabled?'.4':'1'}
-function getNames(){return [...namesEl.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean)}
-function updateState(){genBtn.disabled=getNames().length===0}
-addBtn.addEventListener('click',()=>{addName();namesEl.lastElementChild.querySelector('input').focus()});
-
-function rand(arr){return arr[Math.floor(Math.random()*arr.length)]}
-function shuffled(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a}
-
-// Kies per kolom één niet-lege rij, waarbij binnen het blok geen rij twee keer voorkomt.
-function uniqueSequence(keys){
-  const search=(idx,used,picks)=>{
-    if(idx===keys.length) return picks;
-    const key=keys[idx];
-    const candidates=shuffled(rows.filter(r=>r[key] && !used.has(r.nr)));
-    for(const r of candidates){
-      const result=search(idx+1,new Set([...used,r.nr]),[...picks,{row:r,value:r[key]}]);
-      if(result) return result;
-    }
-    return null;
-  };
-  return search(0,new Set(),[]);
-}
-
-function renderActions(picks){
-  const el=document.getElementById('allActions'); el.innerHTML='';
-  picks.forEach((value,i)=>{
-    const pill=document.createElement('span'); pill.className='pill'; pill.textContent=value; el.appendChild(pill);
-    if(i<picks.length-1){const ar=document.createElement('span'); ar.className='arrow'; ar.textContent='→'; el.appendChild(ar)}
-  });
-}
-
-function generate(){
-  const names=getNames(); if(!names.length) return;
-  // Actie 1 en 2 zijn optioneel; actie 3 blijft altijd onderdeel van de reeks.
-  const firstAll=uniqueSequence(['a1','a2','a3']);
-  const first=firstAll.filter((p,i)=> i===2 || Math.random()<0.5);
-  const second=uniqueSequence(['a4','a5','a6']);
-  const finalRow=rand(rows.filter(r=>r.a7 && r.ends.length));
-  const ending=rand(finalRow.ends);
-
-  document.getElementById('person').textContent=rand(names);
-  renderActions([...first.map(p=>p.value), ...second.map(p=>p.value), finalRow.a7, ending]);
-  document.getElementById('empty').style.display='none';
-  const outcome=document.getElementById('outcome'); outcome.style.display='block'; outcome.style.animation='none'; void outcome.offsetWidth; outcome.style.animation='pop .38s cubic-bezier(.2,.8,.2,1)';
-  const status=document.getElementById('status'); status.textContent='Gegenereerd'; status.classList.add('ready');
-}
-genBtn.addEventListener('click',generate);
-document.getElementById('generateBottom').addEventListener('click',generate);
-
-addName(); addName(); addName();
-</script>
-</body>
-</html>
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);
+background:
+radial-gradient(ellipse at 12% 18%,rgba(255,94,132,.22),transparent 30%),
+radial-gradient(ellipse at 86% 12%,rgba(160,35,83,.28),transparent 34%),
+linear-gradient(145deg,var(--bg),#0d060a 58%,#280d19);}
+.wrap{width:min(1100px,calc(100% - 32px));margin:0 auto;padding:52px 0 64px}
+header{margin-bottom:26px}.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2);font-weight:800;margin-bottom:10px}
+h1{font-size:clamp(34px,6vw,62px);line-height:.98;letter-spacing:-.045em;margin:0}.grid{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:22px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.input-card,.result-card{padding:24px}.card-title{font-size:18px;font-weight:800;margin:0 0 14px}.names{display:flex;flex-direction:column;gap:9px}.name-row{display:grid;grid-template-columns:32px 1fr 34px;gap:8px;align-items:center}.num{font-size:12px;color:#8d7182;text-align:center}input,select{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.055);color:var(--text);border-radius:13px;padding:12px 13px;font:inherit;outline:none}input:focus,select:focus{border-color:rgba(255,111,145,.7);box-shadow:0 0 0 3px rgba(255,111,145,.11)}.role-select{padding:12px 8px;text-align:center}.remove{border:0;background:transparent;color:#9b7587;font-size:18px;cursor:pointer}.add{width:100%;margin-top:14px;border:1px dashed rgba(255,255,255,.18);background:transparent;color:var(--muted);border-radius:13px;padding:11px 12px;cursor:pointer;font-weight:700}.two-mode{display:none;margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}.two-mode.show{display:block}.two-mode-label{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:9px}.mode-options{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.mode-option{position:relative}.mode-option input{position:absolute;opacity:0;pointer-events:none}.mode-option span{display:block;text-align:center;padding:9px 6px;border-radius:10px;border:1px solid var(--line);font-size:12px;font-weight:800;color:var(--muted);cursor:pointer}.mode-option input:checked + span{background:rgba(255,111,145,.17);border-color:rgba(255,111,145,.55);color:#fff}.generate{width:100%;margin-top:18px;border:0;border-radius:15px;padding:14px 18px;cursor:pointer;font-weight:900;font-size:16px;color:#260a16;background:linear-gradient(135deg,#ffc2ce,#ff7998 56%,#d94975)}.generate:disabled{opacity:.4;cursor:not-allowed}.result-top{display:flex;justify-content:space-between;align-items:center}.status{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#947487;font-weight:800}.status.ready{color:var(--good)}.empty{height:320px;display:grid;place-items:center;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.outcome{display:none}.sequence{display:flex;flex-direction:column;gap:12px}.result-names{font-size:30px;line-height:1.08;font-weight:900;letter-spacing:-.03em;padding:18px 19px;border-radius:17px;background:linear-gradient(135deg,rgba(255,184,199,.10),rgba(180,45,87,.16));border:1px solid var(--line)}.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px 17px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);line-height:1.5}.who{font-weight:900;color:#ffc1d0}.arrow{color:#826274}.action{font-weight:760}.pair{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.action-list{display:flex;flex-direction:column;gap:8px}.action-row{display:flex;align-items:center;gap:8px;padding:11px 13px;border-radius:13px;background:var(--panel2);border:1px solid var(--line)}.note{font-size:12px;color:var(--muted);margin-top:13px;line-height:1.5}@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding-top:32px}}
+</style></head><body><main class="wrap"><header><div class="eyebrow">Random generator</div><h1>Let it happen</h1></header><section class="grid"><aside class="card input-card"><h2 class="card-title">Namen</h2><div id="names" class="names"></div><button id="addName" class="add" type="button">+ Naam toevoegen</button><div id="twoMode" class="two-mode"><div class="two-mode-label">Verdeling bij 2 namen</div><div class="mode-options"><label class="mode-option"><input type="radio" name="twoMode" value="0" checked><span>0 Random</span></label><label class="mode-option"><input type="radio" name="twoMode" value="12"><span>1 → 2</span></label><label class="mode-option"><input type="radio" name="twoMode" value="21"><span>2 → 1</span></label></div></div><button id="generate" class="generate" type="button" disabled>Genereer uitkomst</button></aside><section class="card result-card" aria-live="polite"><div class="result-top"><h2 class="card-title">Vandaag</h2><div id="status" class="status">Nog niet gegenereerd</div></div><div id="empty" class="empty"><strong>Let it happen</strong></div><div id="outcome" class="outcome"><div id="sequence" class="sequence"></div><button id="generateBottom" class="generate" type="button">Genereer uitkomst</button></div></section></section></main><script>
+const rows=[{nr:1,a1:'aftrekken',a2:'aftrekken',a3:'aftrekken',a4:null,a5:null,a6:null,a7:'aftrekken',ends:['handen','borsten','gezicht']},{nr:2,a1:'pijpen',a2:'pijpen',a3:'pijpen',a4:null,a5:null,a6:null,a7:'pijpen',ends:['mond','gezicht','borsten']},{nr:3,a1:null,a2:'beffen',a3:'beffen',a4:null,a5:null,a6:null,a7:'beffen',ends:['vulva','buik']},{nr:4,a1:null,a2:null,a3:null,a4:'missionaris',a5:'missionaris',a6:'missionaris',a7:'missionaris',ends:['vagina','vulva','buik']},{nr:5,a1:null,a2:null,a3:null,a4:'doggy',a5:'doggy',a6:'doggy',a7:'doggy',ends:['vagina','billen']},{nr:6,a1:null,a2:null,a3:null,a4:'rijden',a5:'rijden',a6:'rijden',a7:'rijden',ends:['vagina']}];
+const namesEl=document.getElementById('names'),addBtn=document.getElementById('addName'),genBtn=document.getElementById('generate');function addName(value=''){if(namesEl.children.length>=10)return;const row=document.createElement('div');row.className='name-row';row.innerHTML='<div class="num"></div><input maxlength="60" placeholder="Naam"><button class="remove" type="button">×</button>';row.querySelector('input').value=value;row.querySelector('input').addEventListener('input',updateState);row.querySelector('.remove').addEventListener('click',()=>{if(namesEl.children.length>1)row.remove();else row.querySelector('input').value='';renumber();updateState()});namesEl.appendChild(row);renumber();updateState()}function renumber(){[...namesEl.children].forEach((r,i)=>r.querySelector('.num').textContent=String(i+1).padStart(2,'0'));addBtn.disabled=namesEl.children.length>=10}function getNames(){return [...namesEl.querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean)}function updateState(){const count=getNames().length;genBtn.disabled=count===0;document.getElementById('twoMode').classList.toggle('show',count===2)}function getTwoMode(){return document.querySelector('input[name="twoMode"]:checked')?.value||'0'}addBtn.addEventListener('click',()=>addName());function rand(a){return a[Math.floor(Math.random()*a.length)]}function shuffled(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}function uniqueSequence(keys){const search=(idx,used,picks)=>{if(idx===keys.length)return picks;const key=keys[idx],candidates=shuffled(rows.filter(r=>r[key]&&!used.has(r.nr)));for(const r of candidates){const result=search(idx+1,new Set([...used,r.nr]),[...picks,{row:r,value:r[key],key}]);if(result)return result}return null};return search(0,new Set(),[])}
+function balancedTwoNames(names,steps){const[a,b]=names,n=steps.length,countA=Math.floor(n/2),countB=n-countA;let labels=Array(countA).fill(a).concat(Array(countB).fill(b));for(let tries=0;tries<500;tries++){labels=shuffled(labels);const alternating=labels.every((x,i)=>i===0||x!==labels[i-1]),tooLong=labels.some((x,i)=>i>=2&&x===labels[i-1]&&x===labels[i-2]);if(!alternating&&!tooLong)break}for(const id of['a3','a4']){const idx=steps.map((s,i)=>s.id===id?i:-1).filter(i=>i>=0);if(idx.length===2&&labels[idx[0]]===labels[idx[1]]){const want=labels[idx[0]]===a?b:a,swap=labels.findIndex((lab,i)=>lab===want&&!idx.includes(i));if(swap>=0)[labels[idx[1]],labels[swap]]=[labels[swap],labels[idx[1]]]}}return labels}
+function makeBaseSeries(){const first=uniqueSequence(['a1','a2','a3']),second=uniqueSequence(['a4','a5','a6']),finalRow=rand(rows.filter(r=>r.a7&&r.ends.length)),ending=rand(finalRow.ends),optional=[...(Math.random()<.5?[{id:'a1',action:first[0].value}]:[]),...(Math.random()<.5?[{id:'a2',action:first[1].value}]:[])];return[...optional,{id:'a3',action:first[2].value},{id:'a4',action:second[0].value},{id:'a5',action:second[1].value},{id:'a6',action:second[2].value},{id:'a7',action:finalRow.a7},{id:'end',action:ending}]}
+function makeFullEightSeries(){const first=uniqueSequence(['a1','a2','a3']),second=uniqueSequence(['a4','a5','a6']),finalRow=rand(rows.filter(r=>r.a7&&r.ends.length)),ending=rand(finalRow.ends);return[{id:'a1',action:first[0].value},{id:'a2',action:first[1].value},{id:'a3',action:first[2].value},{id:'a4',action:second[0].value},{id:'a5',action:second[1].value},{id:'a6',action:second[2].value},{id:'a7',action:finalRow.a7},{id:'end',action:ending}]}
+function buildTwoNameScenario(names){const mode=getTwoMode(),ordered=mode!=='0',naam1=mode==='21'?names[1]:names[0],naam2=mode==='21'?names[0]:names[1];if(!ordered){const first=uniqueSequence(['a1','a2','a3']),second=uniqueSequence(['a4','a5','a6']),finalRow=rand(rows.filter(r=>r.a7&&r.ends.length)),ending=rand(finalRow.ends),include1=Math.random()<.5,include2=Math.random()<.5,steps=[...(include1?[{id:'a1',action:first[0].value}]:[]),...(include2?[{id:'a2',action:first[1].value}]:[]),{id:'a3',action:first[2].value},{id:'a3',action:first[2].value},{id:'a4',action:second[0].value},{id:'a4',action:second[0].value},{id:'a5',action:second[1].value},{id:'a6',action:second[2].value},{id:'a7',action:finalRow.a7},{id:'end',action:ending}],pre=steps.slice(0,-2),labels=balancedTwoNames(names,pre),finalName=rand(names),named=[...pre.map((s,i)=>({...s,name:labels[i]})),{...steps[steps.length-2],name:finalName},{...steps[steps.length-1],name:finalName}];return{mode:'mixed',steps:named}}const firstSeries=makeFullEightSeries().slice(0,5).map(s=>({...s,name:naam1})),secondSeries=makeFullEightSeries();let labels7=[naam2,naam2,naam2,naam2,naam2,naam1,naam1];for(let tries=0;tries<400;tries++){labels7=shuffled(labels7);const tooLong=labels7.some((x,i)=>i>=2&&x===labels7[i-1]&&x===labels7[i-2]);if(!tooLong)break}const assignedSecond=secondSeries.map((s,i)=>i<7?{...s,name:labels7[i]}:{...s,name:labels7[6]});return{mode:'restart',steps:[...firstSeries,...assignedSecond]}}
+function buildSteps(names){if(names.length===1)return{mode:'quiet',person:names[0],steps:makeBaseSeries()};if(names.length===2)return buildTwoNameScenario(names);return{mode:'quiet',person:rand(names),steps:makeBaseSeries()}}
+function renderQuiet(person,steps){const el=document.getElementById('sequence');el.innerHTML='';const title=document.createElement('div');title.className='result-names';title.textContent=person;el.appendChild(title);const list=document.createElement('div');list.className='action-list';steps.forEach(s=>{const row=document.createElement('div');row.className='action-row';const action=document.createElement('span');action.className='action';action.textContent=s.action;row.appendChild(action);list.appendChild(row)});el.appendChild(list)}function renderNamed(steps){const el=document.getElementById('sequence');el.innerHTML='';const list=document.createElement('div');list.className='action-list';steps.forEach(s=>{const row=document.createElement('div');row.className='action-row',who=document.createElement('span'),action=document.createElement('span');who.className='who';who.textContent=s.name;action.className='action';action.textContent=s.action;row.appendChild(who);row.appendChild(action);list.appendChild(row)});el.appendChild(list)}function generate(){const names=getNames();if(!names.length)return;const result=buildSteps(names);if(result.mode==='quiet')renderQuiet(result.person,result.steps);else renderNamed(result.steps);document.getElementById('empty').style.display='none';document.getElementById('outcome').style.display='block';const st=document.getElementById('status');st.textContent='Gegenereerd';st.classList.add('ready')}genBtn.addEventListener('click',generate);document.getElementById('generateBottom').addEventListener('click',generate);addName();addName();addName();
+</script></body></html>
